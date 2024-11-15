@@ -1,14 +1,106 @@
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import org.json.JSONObject;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author ACER
  */
 public class FrameCekCuaca extends javax.swing.JFrame {
+
+    private void cekCuaca() {
+        String apiKey = "e57367f6bf9f06154278b83d65a4a557"; // Ganti dengan API Key Anda
+        String kota = jKota.getText().trim(); // Ambil teks dari jKota
+        if (kota.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "Masukkan nama kota terlebih dahulu!",
+                    "Peringatan",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String urlString = "https://api.openweathermap.org/data/2.5/weather?q=" + kota + "&units=metric&appid=" + apiKey;
+
+        try {
+            // Membuat URL dan membuka koneksi
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            // Periksa status respons
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Baca respons dari API
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                // Parsing JSON
+                JSONObject jsonResponse = new JSONObject(response.toString());
+                String kondisi = jsonResponse.getJSONArray("weather").getJSONObject(0).getString("main");
+                String detail = jsonResponse.getJSONArray("weather").getJSONObject(0).getString("description");
+                String iconCode = jsonResponse.getJSONArray("weather").getJSONObject(0).getString("icon");
+                double suhu = jsonResponse.getJSONObject("main").getDouble("temp");
+
+                // Update UI
+                jLabelKondisi.setText("Kondisi: " + kondisi);
+                jLabelKet.setText("Detail: " + detail);
+                jLabelSuhu.setText("Suhu: " + suhu + "°C");
+
+                String iconUrl = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
+                ImageIcon icon = new ImageIcon(new URL(iconUrl));
+                jLabelIcon.setIcon(icon);
+
+                // Tambahkan kota ke jKotaFavorit jika belum ada
+                if (!isKotaInComboBox(kota)) {
+                    jKotaFavorit.addItem(kota);
+                }
+
+            } else {
+                // Tampilkan pesan kesalahan dalam dialog
+                JOptionPane.showMessageDialog(this,
+                        "Gagal mengambil data cuaca. Periksa koneksi atau nama kota.\nKode respons: " + responseCode,
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            // Tampilkan pesan kesalahan exception dalam dialog
+            JOptionPane.showMessageDialog(this,
+                    "Terjadi kesalahan:\n" + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Cek apakah nama kota sudah ada di jComboBox
+     *
+     * @param kota Nama kota yang ingin dicek
+     * @return true jika kota sudah ada, false jika belum
+     */
+    private boolean isKotaInComboBox(String kota) {
+        for (int i = 0; i < jKotaFavorit.getItemCount(); i++) {
+            if (jKotaFavorit.getItemAt(i).equalsIgnoreCase(kota)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Creates new form FrameCekCuaca
@@ -59,9 +151,11 @@ public class FrameCekCuaca extends javax.swing.JFrame {
         jPanel1.add(jLabel2, gridBagConstraints);
 
         jLabelIcon.setText("icon");
+        jLabelIcon.setPreferredSize(new java.awt.Dimension(64, 64));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridheight = 3;
         gridBagConstraints.insets = new java.awt.Insets(6, 13, 6, 13);
         jPanel1.add(jLabelIcon, gridBagConstraints);
 
@@ -98,6 +192,11 @@ public class FrameCekCuaca extends javax.swing.JFrame {
         jPanel1.add(jKota, gridBagConstraints);
 
         jCek.setText("Cek");
+        jCek.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCekActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
@@ -106,7 +205,18 @@ public class FrameCekCuaca extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(6, 17, 6, 17);
         jPanel1.add(jCek, gridBagConstraints);
 
-        jKotaFavorit.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jKotaFavorit.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Jakarta" }));
+        jKotaFavorit.setSelectedIndex(-1);
+        jKotaFavorit.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jKotaFavoritItemStateChanged(evt);
+            }
+        });
+        jKotaFavorit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jKotaFavoritActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -159,6 +269,19 @@ public class FrameCekCuaca extends javax.swing.JFrame {
     private void jKotaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jKotaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jKotaActionPerformed
+
+    private void jCekActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCekActionPerformed
+        cekCuaca();        // TODO add your handling code here:
+    }//GEN-LAST:event_jCekActionPerformed
+
+    private void jKotaFavoritItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jKotaFavoritItemStateChanged
+        jKota.setText(jKotaFavorit.getSelectedItem().toString());
+        cekCuaca();// TODO add your handling code here:
+    }//GEN-LAST:event_jKotaFavoritItemStateChanged
+
+    private void jKotaFavoritActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jKotaFavoritActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jKotaFavoritActionPerformed
 
     /**
      * @param args the command line arguments

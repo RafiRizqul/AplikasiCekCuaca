@@ -1,10 +1,17 @@
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 import org.json.JSONObject;
 
 /*
@@ -17,6 +24,102 @@ import org.json.JSONObject;
  * @author ACER
  */
 public class FrameCekCuaca extends javax.swing.JFrame {
+
+    private void loadFromCSV() {
+        // Pilih file CSV menggunakan JFileChooser
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Pilih File CSV");
+
+        int userSelection = fileChooser.showOpenDialog(this);
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            return; // Jika pengguna membatalkan pemilihan file
+        }
+
+        File fileToOpen = fileChooser.getSelectedFile();
+        String filePath = fileToOpen.getAbsolutePath();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            DefaultTableModel model = (DefaultTableModel) jTableSemua.getModel();
+            model.setRowCount(0); // Hapus baris yang ada sebelum memuat data baru
+
+            String line;
+            boolean isFirstLine = true;
+
+            // Membaca setiap baris dari file CSV
+            while ((line = reader.readLine()) != null) {
+                // Skip header
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue;
+                }
+
+                // Pisahkan kolom berdasarkan koma (csv)
+                String[] data = line.split(",");
+
+                // Menambahkan data ke dalam model tabel
+                model.addRow(data);
+            }
+
+            // Menampilkan konfirmasi bahwa data telah dimuat
+            JOptionPane.showMessageDialog(this, "Data berhasil dimuat dari " + filePath, "Sukses", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IOException e) {
+            // Menampilkan dialog error jika terjadi kesalahan saat memuat file CSV
+            JOptionPane.showMessageDialog(this, "Gagal memuat data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void saveToCSV() {
+        // Pilih lokasi dan nama file CSV menggunakan JFileChooser
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Simpan Data Cuaca");
+        fileChooser.setSelectedFile(new File("data_cuaca.csv")); // Nama file default
+
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            return; // Jika pengguna membatalkan penyimpanan
+        }
+
+        File fileToSave = fileChooser.getSelectedFile();
+        String filePath = fileToSave.getAbsolutePath();
+
+        // Pastikan file berakhiran .csv
+        if (!filePath.endsWith(".csv")) {
+            filePath += ".csv";
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            DefaultTableModel model = (DefaultTableModel) jTableSemua.getModel();
+            int rowCount = model.getRowCount();
+            int columnCount = model.getColumnCount();
+
+            // Menulis header (kolom) ke file CSV
+            for (int i = 0; i < columnCount; i++) {
+                writer.write(model.getColumnName(i));
+                if (i < columnCount - 1) {
+                    writer.write(",");
+                }
+            }
+            writer.newLine();
+
+            // Menulis data setiap baris ke file CSV
+            for (int row = 0; row < rowCount; row++) {
+                for (int col = 0; col < columnCount; col++) {
+                    writer.write(String.valueOf(model.getValueAt(row, col)));
+                    if (col < columnCount - 1) {
+                        writer.write(",");
+                    }
+                }
+                writer.newLine();
+            }
+
+            // Menampilkan konfirmasi bahwa data telah disimpan
+            JOptionPane.showMessageDialog(this, "Data berhasil disimpan ke " + filePath, "Sukses", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException e) {
+            // Menampilkan dialog error jika terjadi kesalahan saat menyimpan
+            JOptionPane.showMessageDialog(this, "Gagal menyimpan data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     private void cekCuaca() {
         String apiKey = "e57367f6bf9f06154278b83d65a4a557"; // Ganti dengan API Key Anda
@@ -61,6 +164,7 @@ public class FrameCekCuaca extends javax.swing.JFrame {
                 jLabelKet.setText("Detail: " + detail);
                 jLabelSuhu.setText("Suhu: " + suhu + "°C");
 
+                // Tampilkan ikon cuaca
                 String iconUrl = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
                 ImageIcon icon = new ImageIcon(new URL(iconUrl));
                 jLabelIcon.setIcon(icon);
@@ -69,6 +173,10 @@ public class FrameCekCuaca extends javax.swing.JFrame {
                 if (!isKotaInComboBox(kota)) {
                     jKotaFavorit.addItem(kota);
                 }
+
+                // Tambahkan data ke tabel
+                DefaultTableModel model = (DefaultTableModel) jTableSemua.getModel();
+                model.addRow(new Object[]{kota, kondisi, detail, suhu + "°C"});
 
             } else {
                 // Tampilkan pesan kesalahan dalam dialog
@@ -87,12 +195,7 @@ public class FrameCekCuaca extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * Cek apakah nama kota sudah ada di jComboBox
-     *
-     * @param kota Nama kota yang ingin dicek
-     * @return true jika kota sudah ada, false jika belum
-     */
+// Helper method to check if kota is already in the ComboBox
     private boolean isKotaInComboBox(String kota) {
         for (int i = 0; i < jKotaFavorit.getItemCount(); i++) {
             if (jKotaFavorit.getItemAt(i).equalsIgnoreCase(kota)) {
@@ -102,6 +205,12 @@ public class FrameCekCuaca extends javax.swing.JFrame {
         return false;
     }
 
+    /**
+     * Cek apakah nama kota sudah ada di jComboBox
+     *
+     * @param kota Nama kota yang ingin dicek
+     * @return true jika kota sudah ada, false jika belum
+     */
     /**
      * Creates new form FrameCekCuaca
      */
@@ -229,10 +338,7 @@ public class FrameCekCuaca extends javax.swing.JFrame {
 
         jTableSemua.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
                 "Kota", "Kondisi Cuaca", "Detail Cuaca", "Suhu "
@@ -248,6 +354,11 @@ public class FrameCekCuaca extends javax.swing.JFrame {
         jPanel1.add(jScrollPane1, gridBagConstraints);
 
         jLoad.setText("Load");
+        jLoad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jLoadActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 9;
@@ -255,6 +366,11 @@ public class FrameCekCuaca extends javax.swing.JFrame {
         jPanel1.add(jLoad, gridBagConstraints);
 
         jSave.setText("Save");
+        jSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jSaveActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 9;
@@ -282,6 +398,14 @@ public class FrameCekCuaca extends javax.swing.JFrame {
     private void jKotaFavoritActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jKotaFavoritActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jKotaFavoritActionPerformed
+
+    private void jSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSaveActionPerformed
+        saveToCSV();        // TODO add your handling code here:
+    }//GEN-LAST:event_jSaveActionPerformed
+
+    private void jLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLoadActionPerformed
+        loadFromCSV();        // TODO add your handling code here:
+    }//GEN-LAST:event_jLoadActionPerformed
 
     /**
      * @param args the command line arguments

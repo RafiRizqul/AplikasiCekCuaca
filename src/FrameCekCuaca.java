@@ -25,22 +25,140 @@ public class FrameCekCuaca extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabelIcon = new javax.swing.JLabel();
+        jLabelKondisi = new javax.swing.JLabel();
+        jLabelKet = new javax.swing.JLabel();
+        jLabelSuhu = new javax.swing.JLabel();
+        jKota = new javax.swing.JTextField();
+        jCek = new javax.swing.JButton();
+        jKotaFavorit = new javax.swing.JComboBox<>();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTableSemua = new javax.swing.JTable();
+        jLoad = new javax.swing.JButton();
+        jSave = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        jPanel1.setLayout(new java.awt.GridBagLayout());
+
+        jLabel1.setText("Kota");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(6, 13, 6, 13);
+        jPanel1.add(jLabel1, gridBagConstraints);
+
+        jLabel2.setText("Pilih Kota Favorit");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(6, 13, 6, 13);
+        jPanel1.add(jLabel2, gridBagConstraints);
+
+        jLabelIcon.setText("icon");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.insets = new java.awt.Insets(6, 13, 6, 13);
+        jPanel1.add(jLabelIcon, gridBagConstraints);
+
+        jLabelKondisi.setText("Kondisi...");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.insets = new java.awt.Insets(6, 13, 6, 13);
+        jPanel1.add(jLabelKondisi, gridBagConstraints);
+
+        jLabelKet.setText("Keterangan Cuaca");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.insets = new java.awt.Insets(6, 13, 6, 13);
+        jPanel1.add(jLabelKet, gridBagConstraints);
+
+        jLabelSuhu.setText("Suhu....");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.insets = new java.awt.Insets(6, 13, 6, 13);
+        jPanel1.add(jLabelSuhu, gridBagConstraints);
+
+        jKota.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jKotaActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(6, 13, 6, 13);
+        jPanel1.add(jKota, gridBagConstraints);
+
+        jCek.setText("Cek");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.insets = new java.awt.Insets(6, 17, 6, 17);
+        jPanel1.add(jCek, gridBagConstraints);
+
+        jKotaFavorit.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(6, 13, 6, 13);
+        jPanel1.add(jKotaFavorit, gridBagConstraints);
+
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(452, 200));
+
+        jTableSemua.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Kota", "Kondisi Cuaca", "Detail Cuaca", "Suhu "
+            }
+        ));
+        jScrollPane1.setViewportView(jTableSemua);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.insets = new java.awt.Insets(6, 13, 6, 13);
+        jPanel1.add(jScrollPane1, gridBagConstraints);
+
+        jLoad.setText("Load");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.insets = new java.awt.Insets(6, 13, 6, 13);
+        jPanel1.add(jLoad, gridBagConstraints);
+
+        jSave.setText("Save");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.insets = new java.awt.Insets(6, 13, 6, 13);
+        jPanel1.add(jSave, gridBagConstraints);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jKotaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jKotaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jKotaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -78,5 +196,19 @@ public class FrameCekCuaca extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jCek;
+    private javax.swing.JTextField jKota;
+    private javax.swing.JComboBox<String> jKotaFavorit;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabelIcon;
+    private javax.swing.JLabel jLabelKet;
+    private javax.swing.JLabel jLabelKondisi;
+    private javax.swing.JLabel jLabelSuhu;
+    private javax.swing.JButton jLoad;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton jSave;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTableSemua;
     // End of variables declaration//GEN-END:variables
 }
